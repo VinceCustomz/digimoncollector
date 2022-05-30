@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>{{ digimon.name }} Details</h1>
+
+<div class="row">
+  <div class="col s6">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">{{ digimon.name }}</span>
+          <p>Type: {{ digimon.type }}</p>
+          <p>Description: {{ digimon.description }}</p>
+        {% if digimon.level > 0 %}
+          <p>Level: {{ digimon.level }}</p>
+        {% else %}
+          <p>Level: Baby</p>
+        {% endif %}
+      </div>
+      <div class="card-action">
+        <a href="{% url 'digimons_update' digimon.id %}">Edit</a>
+        <a href="{% url 'digimons_delete' digimon.id %}">Delete</a>
+      </div>
+    </div>
+  </div>
+  <div class="col s6">
+    
+    <form action="{% url 'add_playtime' digimon.id %}" method="post">
+      {% csrf_token %}
+      {{ playtime_form.as_p }}
+      <input type="submit" class="btn" value="Add Playtime">
+    </form>
+  
+    <br>
+    {% if digimon.played_for_today %}
+      <div class="card-panel teal-text center-align">{{digimon.name}} had enough play time today</div>
+    {% else %}
+      <div class="card-panel red-text center-align">{{digimon.name}} might need some playtime</div>
+    {% endif %}
+
+    <table class="striped">
+      <thead>
+        <tr><th>Date</th><th>Petting</th></tr>
+      </thead>
+      
+      <tbody>
+        {% for playtime in digimon.playtime_set.all %}
+          <tr>
+            <td>{{playtime.date}}</td>
+            <td>{{playtime.get_petting_display}}</td>
+            {% comment %} will display 'Morning' in this case {% endcomment %}
+          </tr>
+        {% endfor %}
+      </tbody>
+
+    </table>
+  </div>
+</div>
+
+<hr>
+<div class="row">
+  <div class="col s6">
+    <h3>{{ digimon.name }}'s Pets</h3>
+    {% if digimon.pets.count %}
+      {% for pet in digimon.pets.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              A <span style="color: {{ pet.color }}">{{ pet.color }}</span> {{ pet.name }}
+            </span>
+          </div>
+
+          {% comment %} Remove Pet from Digimon {% endcomment %}
+          <div class="card-action">
+            <form action="{% url 'unassoc_pet' digimon.id pet.id %}" method="post">
+                {% csrf_token %}
+              <button type="submit" class="btn">Remove</button>
+            </form>
+          </div>
+
+        </div>
+      {% endfor %}
+    {% else %}
+      <h5>No Pets :(</h5>
+    {% endif %}
+  </div>
+  <!-- Available toys will come after this line -->
+  <div class="col s6">
+    <h3>Available Pets</h3>
+    {% if pets.count %}
+      {% for pet in pets.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              A <span style="color: {{ pet.color }}">{{ pet.color }}</span> {{ pet.name }}
+            </span>
+          </div>
+          <div class="card-action">
+            
+            <form action="{% url 'assoc_pet' digimon.id pet.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn">Add</button>
+            </form>
+          
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <h5>{{digimon.name}} Already Has All Pets Available</h5>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  var dateEl = document.getElementById('id_date');
+  M.Datepicker.init(dateEl, {
+    format: 'yyyy-mm-dd',
+    defaultDate: new Date(),
+    setDefaultDate: true,
+    autoClose: true
+  });
+
+  var selectEl = document.getElementById('id_petting');
+  M.FormSelect.init(selectEl);
+</script>
+
+{% endblock %}

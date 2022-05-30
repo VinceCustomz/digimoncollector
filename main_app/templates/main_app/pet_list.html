@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Pet List</h1>
+
+{% for pet in pet_list %}
+  <a href="{% url 'pets_detail' pet.id %}">
+    <div class="card">
+        <div class="card-content">
+            <span class="card-title">{{ pet.name }}</span>
+            <p>Color: {{ pet.color }}</p>
+        </div>
+    </div>
+  </a>
+{% endfor %}
+
+{% endblock %}

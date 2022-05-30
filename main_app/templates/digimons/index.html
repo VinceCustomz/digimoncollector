@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Digimon List</h1>
+
+{% for digimon in digimons %}
+  <div class="card">
+    <a href="{% url 'detail' digimon.id %}">
+      <div class="card-content">
+        <span class="card-title">{{ digimon.name }}</span>
+          <p>Type: {{ digimon.type }}</p>
+          <p>Description: {{ digimon.description }}</p>
+        {% if digimon.level > 0 %}
+          <p>Level: {{ digimon.level }}</p>
+        {% else %}
+          <p>Level: Baby</p>
+        {% endif %}
+      </div>
+    </a>
+  </div>
+{% endfor %}
+
+{% endblock %}
